@@ -31,6 +31,12 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 export const constantRoutes = [
+  // must be placed here!
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
+  },
   {
     path: '/',
     component: Layout,
@@ -68,16 +74,6 @@ export const constantRoutes = [
         meta: { title: '评论用户查询', icon: 'table' }
       }
     ]
-  },
-  {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true
-  },
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
   },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
