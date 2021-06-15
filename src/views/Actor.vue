@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { neo4j_relation } from "@/api/movie";
+import { neo4j_relation } from "@/api";
 
 export default {
   data() {

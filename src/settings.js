@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '数据仓库电影查询系统',
+  title: 'AI与商务智能',
 
   /**
    * @type {boolean} true | false

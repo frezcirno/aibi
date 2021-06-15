@@ -49,30 +49,20 @@ export const constantRoutes = [
         meta: { title: 'Dashboard', icon: 'dashboard' }
       },
       {
-        path: 'org',
-        component: () => import('@/views/Org.vue'),
+        path: 'Organization/:hasPermId',
+        component: () => import('@/views/Organization.vue'),
         meta: { title: '组织查询', icon: 'table' }
       },
       {
-        path: 'organization',
-        component: () => import('@/views/Organization.vue'),
+        path: 'Person/:hasPermId',
+        component: () => import('@/views/Person.vue'),
+        meta: { title: '人员查询', icon: 'table' }
+      },
+      {
+        path: 'org',
+        component: () => import('@/views/Org.vue'),
         meta: { title: '组织模糊查询', icon: 'table' }
       },
-      {
-        path: 'movie',
-        component: () => import('@/views/Product.vue'),
-        meta: { title: '电影实体查询', icon: 'table' }
-      },
-      {
-        path: 'relation',
-        component: () => import('@/views/Actor.vue'),
-        meta: { title: '合作关系查询', icon: 'table' }
-      },
-      {
-        path: 'user',
-        component: () => import('@/views/User.vue'),
-        meta: { title: '评论用户查询', icon: 'table' }
-      }
     ]
   },
   // 404 page must be placed at the end !!!

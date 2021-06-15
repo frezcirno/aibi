@@ -1,7 +1,7 @@
 <template>
   <div id="movie-querier">
     <div class="rule">
-      <h1 style="margin: 55px 30px 20px">电影查询</h1>
+      <h1 style="margin: 55px 30px 20px">评论用户查询</h1>
       <div class="content">
         <div class="myform">
           <el-form ref="form" :model="form" label-width="150px">
@@ -12,41 +12,12 @@
               <el-input v-model="form.title" placeholder="电影名称" />
             </el-form-item>
             <el-form-item label="电影类别">
-              <el-select v-model="form.genre" multiple placeholder="请选择">
+              <el-select v-model="form.genre" placeholder="请选择">
                 <el-option
                   v-for="item in genre_options"
                   :key="item"
                   :label="item"
                   :value="item"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="上映时间(年月日)">
-              <el-date-picker v-model="form.y" type="year" />
-              <el-select v-model="form.m" placeholder="月">
-                <el-option
-                  v-for="i in month_options"
-                  :key="i"
-                  :label="i"
-                  :value="i"
-                />
-              </el-select>
-              <el-select v-model="form.d" placeholder="日">
-                <el-option
-                  v-for="i in day_options"
-                  :key="i"
-                  :label="i"
-                  :value="i"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="上映时间(星期)">
-              <el-select v-model="form.weekday" placeholder="星期">
-                <el-option
-                  v-for="i in weekday_options"
-                  :key="i"
-                  :label="i"
-                  :value="i"
                 />
               </el-select>
             </el-form-item>
@@ -119,7 +90,7 @@
 </template>
 
 <script>
-import { combine_product } from "@/api/movie";
+import { combine_product } from "@/api";
 import Time from "@/components/Time.vue";
 
 export default {
