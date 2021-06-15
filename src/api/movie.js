@@ -10,15 +10,15 @@ export function combine_product(params) {
 
 export function mysql_product(params) {
   return request({
-    url: '/api/mysql/product',
+    url: '/api/product',
     method: 'get',
     params
   })
 }
 
-export function mysql_movie(params) {
+export function find_organization(params) {
   return request({
-    url: '/api/mysql/movie',
+    url: '/api/organization',
     method: 'get',
     params
   })
@@ -26,7 +26,7 @@ export function mysql_movie(params) {
 
 export function mysql_sql(params) {
   return request({
-    url: '/api/mysql/sql',
+    url: '/api/sql',
     method: 'get',
     params
   })
@@ -34,7 +34,7 @@ export function mysql_sql(params) {
 
 export function neo4j_product(params) {
   return request({
-    url: '/api/mysql/product',
+    url: '/api/product',
     method: 'get',
     params
   })

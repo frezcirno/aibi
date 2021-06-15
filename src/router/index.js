@@ -32,69 +32,36 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true
-  },
-
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
-
-  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/',
-    component: Layout,
     children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: { title: 'Dashboard', icon: 'dashboard' }
+      },
+      {
+        path: 'org',
+        component: () => import('@/views/Org.vue'),
+        meta: { title: '组织查询', icon: 'table' }
+      },
       {
         path: 'organization',
         component: () => import('@/views/Organization.vue'),
-        meta: { title: '组织查询', icon: 'table' }
+        meta: { title: '组织模糊查询', icon: 'table' }
       },
-    ]
-  },
-
-  {
-    path: '/',
-    component: Layout,
-    children: [
       {
         path: 'movie',
         component: () => import('@/views/Product.vue'),
         meta: { title: '电影实体查询', icon: 'table' }
       },
-    ]
-  },
-
-  {
-    path: '/',
-    component: Layout,
-    children: [
       {
         path: 'relation',
         component: () => import('@/views/Actor.vue'),
         meta: { title: '合作关系查询', icon: 'table' }
       },
-    ]
-  },
-
-  {
-    path: '/',
-    component: Layout,
-    children: [
       {
         path: 'user',
         component: () => import('@/views/User.vue'),
@@ -102,7 +69,16 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

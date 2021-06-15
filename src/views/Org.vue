@@ -1,7 +1,7 @@
 <template>
   <div id="movie-querier">
     <div class="rule">
-      <h1 style="margin: 55px 30px 20px">组织模糊查询</h1>
+      <h1 style="margin: 55px 30px 20px">组织查询</h1>
       <div class="content">
         <div class="myform">
           <el-form ref="form" :model="form" label-width="150px">
@@ -47,40 +47,6 @@ export default {
     return {
       list: null,
       listLoading: false,
-      genre_options: [
-        "",
-        "Action",
-        "Adventure",
-        "Science Fiction",
-        "Suspense",
-        "Comedy",
-        "Drama",
-        "Fantasy",
-        "Horror",
-        "Arts",
-        "Culture",
-        "Entertainment",
-        "Special Interest",
-        "Kids",
-        "Sports",
-        "Documentary",
-        "Romance",
-        "Western",
-        "Military  War",
-        "Music Videos  Concerts",
-        "Arthouse",
-        "Animation",
-        "Historical",
-        "Young Adult Audience",
-        "LGBTQ",
-        "International",
-        "Anime",
-        "Faith  Spirituality",
-        "Unscripted",
-        "Fitness",
-        "Talk Show  Variety",
-        "Erotic",
-      ],
       form: {
         name: "",
         title: "",
