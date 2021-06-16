@@ -11,20 +11,22 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 driver = GraphDatabase.driver("neo4j://7c00h.xyz:7687", auth=("neo4j", "root"))
-session = driver.session()
+# session = driver.session()
 
 app = Flask(__name__)
 CORS(app)
 
 
-def neo4j_query(cypher, **param):
-    def query(tx):
-        res = []
-        for result in tx.run(cypher, **param):
-            res.append(result.values())
-        return res
+def query(tx, cypher, **param):
+    res = []
+    for result in tx.run(cypher, **param):
+        res.append(result.values())
+    return res
 
-    return session.read_transaction(query)
+
+def neo4j_query(cypher, **param):
+    with driver.session() as session:
+        return session.read_transaction(query, cypher, **param)
 
 
 class CustomJSONEncoder(JSONEncoder):
