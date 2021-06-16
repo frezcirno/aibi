@@ -23,6 +23,20 @@ export function neo4j_org(hasPermId) {
   })
 }
 
+export function neo4j_org_psn(hasPermId) {
+  return request({
+    url: '/api/query',
+    params: { cypher: `MATCH path=(p:Person)-[]->()-[]->(o:Organization) WHERE o.hasPermId="${hasPermId}" RETURN path LIMIT 25` }
+  })
+}
+
+export function neo4j_psn(hasPermId) {
+  return request({
+    url: '/api/query',
+    params: { cypher: `MATCH (n:Person) WHERE n.hasPermId="${hasPermId}" RETURN n LIMIT 1` }
+  })
+}
+
 export function combine_product() {
   return {};
 }

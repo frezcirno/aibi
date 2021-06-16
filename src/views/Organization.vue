@@ -12,7 +12,7 @@
               <el-input :value="Data['organization-name']" />
             </el-form-item>
             <el-form-item label="注册地址">
-              <el-input :value="Data.RegisteredAddress" />
+              <el-input :value="this.esc(Data.RegisteredAddress)" />
             </el-form-item>
             <el-form-item label="成立时间">
               <el-input :value="Data.hasLatestOrganizationFoundedDate" />
@@ -24,11 +24,25 @@
         </div>
       </div>
     </div>
+    <div id="result">
+      <h1 style="margin: 55px 30px 20px" v-if="count >= 0">
+        共查询到{{ count }}条结果
+      </h1>
+      <div style="display: flex; justify-content: center; margin: 0 30px">
+        <el-table :data="Person" height="550" stripe style="width: 100%">
+          <el-table-column prop="hasPermId" label="ID" />
+          <el-table-column prop="uri" label="uri" />
+          <el-table-column prop="family-name" label="姓" />
+          <el-table-column prop="given-name" label="名" />
+          <el-table-column prop="honorific-prefix" label="前缀" />
+        </el-table>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { neo4j_org } from "@/api";
+import { neo4j_org, neo4j_org_psn } from "@/api";
 
 export default {
   data() {
@@ -36,40 +50,38 @@ export default {
       list: null,
       listLoading: false,
       Data: {},
-      count: 0,
+      Person: [],
     };
   },
   computed: {
+    count() {
+      return this.Person.length;
+    },
     hasPermId() {
       console.log(this.$route.params.hasPermId);
       return this.$route.params.hasPermId;
     },
   },
   async created() {
-    let res = await neo4j_org(this.hasPermId).then((res) => res.data);
-    this.Data = res.data[0] || {};
-    console.log(this.Data);
+    let res = (await neo4j_org(this.hasPermId).then((res) => res.data)) || {};
+    this.Data = res.data[0];
+    res = (await neo4j_org_psn(this.hasPermId).then((res) => res.data)) || [];
+    this.Person = res.data.map((x) => this.getPersonAndType(x));
+    console.log(this.Person);
   },
   methods: {
+    getPersonAndType(path) {
+      console.log({ ...path.nodes[1], ...path.nodes[0] });
+      return { ...path.nodes[1], ...path.nodes[0] };
+    },
+    esc(s) {
+      if (typeof s == "string") {
+        return s.replaceAll("\n", " ");
+      }
+      return s;
+    },
     reset() {
       this.listLoading = false;
-    },
-    submit() {
-      this.fetchData();
-    },
-    fetchData() {
-      this.listLoading = true;
-      let params = {};
-      if (this.form.name) params["name"] = this.form.name;
-      console.log(params);
-      find_organization(params).then((response) => {
-        this.count = response.data.count;
-        this.Data = response.data.data;
-        this.dbtime = {
-          neo4j: response.data.neo4j,
-        };
-        this.listLoading = false;
-      });
     },
   },
 };
