@@ -113,7 +113,7 @@ export default {
     },
     submit() {
       this.$router.push({
-        name: "Per",
+        name: this.$route.name,
         params: {
           name:
             this.form["family-name"] +

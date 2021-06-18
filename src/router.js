@@ -5,7 +5,6 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-import PassThrough from '@/PassThrough'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -39,51 +38,62 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    name: 'Root',
     path: '/',
-    component: Layout,
     redirect: '/Organization',
+  },
+  {
+    name: 'Organization',
+    path: '/Organization',
+    component: Layout,
+    meta: { title: '组织查询', icon: 'el-icon-zoom-in' },
+    redirect: '/Organization/Detail',
     children: [
       {
-        name: 'Organization',
-        path: 'Organization',
-        component: PassThrough,
-        meta: { title: '组织查询', icon: 'el-icon-zoom-in' },
-        redirect: '/Organization/Detail',
-        children: [
-          {
-            name: 'Detail',
-            path: 'Detail/:hasPermId?',
-            component: () => import('@/views/Organization.vue'),
-            meta: { title: '组织信息查询', icon: 'table' }
-          },
-          {
-            name: 'Fuzzy',
-            path: 'Fuzzy/:name?',
-            component: () => import('@/views/OrgByName.vue'),
-            meta: { title: '组织名称模糊查询', icon: 'table' }
-          },
-        ]
+        name: 'OrganizationDetail',
+        path: 'Detail/:hasPermId?',
+        component: () => import('@/views/Organization.vue'),
+        meta: { title: '组织信息查询', icon: 'table' }
       },
       {
-        name: 'Person',
-        path: 'Person',
-        component: PassThrough,
-        meta: { title: '人员查询', icon: 'user' },
-        redirect: '/Person/Detail',
-        children: [
-          {
-            name: 'Detail',
-            path: 'Detail/:hasPermId?',
-            component: () => import('@/views/Person.vue'),
-            meta: { title: '人员信息查询', icon: 'user' }
-          },
-          {
-            name: 'Fuzzy',
-            path: 'Fuzzy/:name?',
-            component: () => import('@/views/PerByName.vue'),
-            meta: { title: '人名模糊查询', icon: 'user' }
-          },
-        ]
+        name: 'OrganizationFuzzy',
+        path: 'Fuzzy/:name?',
+        component: () => import('@/views/OrgByName.vue'),
+        meta: { title: '组织名称模糊查询', icon: 'table' }
+      },
+    ]
+  },
+  {
+    name: 'Person',
+    path: '/Person',
+    component: Layout,
+    meta: { title: '人员查询', icon: 'user' },
+    redirect: '/Person/Detail',
+    children: [
+      {
+        name: 'PersonDetail',
+        path: 'Detail/:hasPermId?',
+        component: () => import('@/views/Person'),
+        meta: { title: '人员信息查询', icon: 'user' }
+      },
+      {
+        name: 'PersonFuzzy',
+        path: 'Fuzzy/:name?',
+        component: () => import('@/views/PerByName'),
+        meta: { title: '人名模糊查询', icon: 'user' }
+      },
+    ]
+  },
+  {
+    name: 'Graph',
+    path: '/Graph',
+    component: Layout,
+    children: [
+      {
+        name: 'Graph1',
+        path: '/Graph',
+        component: () => import('@/views/Graph'),
+        meta: { title: '网络浏览', icon: 'el-icon-help' },
       }
     ]
   },

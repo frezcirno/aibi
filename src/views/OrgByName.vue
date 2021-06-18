@@ -4,7 +4,12 @@
       <h1 class="title">组织模糊查询</h1>
       <div class="content">
         <div class="myform">
-          <el-form ref="form" :model="form" label-position="left" label-width="100px">
+          <el-form
+            ref="form"
+            :model="form"
+            label-position="left"
+            label-width="100px"
+          >
             <el-form-item label="组织名称">
               <el-input v-model="form.name" placeholder="组织名称" />
             </el-form-item>
@@ -19,9 +24,7 @@
       </div>
     </div>
     <div id="result">
-      <h1 class="title" v-if="count >= 0">
-        共查询到{{ count }}条结果
-      </h1>
+      <h1 class="title" v-if="count >= 0">共查询到{{ count }}条结果</h1>
       <div class="table">
         <el-table :data="Data" height="550" stripe style="width: 100%">
           <el-table-column label="ID">
@@ -89,7 +92,7 @@ export default {
     },
     submit() {
       this.$router.push({
-        name: "Org",
+        name: this.$route.name,
         params: { name: this.form.name },
       });
     },
