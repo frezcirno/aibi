@@ -43,23 +43,26 @@ export const constantRoutes = [
     redirect: '/dashboard',
     children: [
       {
-        path: 'dashboard',
         name: 'Dashboard',
+        path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         meta: { title: 'Dashboard', icon: 'dashboard' }
       },
       {
+        name: 'Organization',
         path: 'Organization/:hasPermId',
         component: () => import('@/views/Organization.vue'),
         meta: { title: '组织查询', icon: 'table' }
       },
       {
+        name: 'Person',
         path: 'Person/:hasPermId',
         component: () => import('@/views/Person.vue'),
         meta: { title: '人员查询', icon: 'table' }
       },
       {
-        path: 'org',
+        name: 'Org',
+        path: 'Org/:name',
         component: () => import('@/views/Org.vue'),
         meta: { title: '组织模糊查询', icon: 'table' }
       },

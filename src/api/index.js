@@ -10,8 +10,7 @@ export function find_organization(params) {
 
 export function neo4j_sql(params) {
   return request({
-    url: '/api/neo4j/sql',
-    method: 'get',
+    url: '/api/query',
     params
   })
 }

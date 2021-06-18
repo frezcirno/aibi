@@ -24,7 +24,15 @@
       </h1>
       <div style="display: flex; justify-content: center; margin: 0 30px">
         <el-table :data="Data" height="550" stripe style="width: 100%">
-          <el-table-column prop="hasPermId" label="ID" />
+          <el-table-column label="ID">
+            <template slot-scope="scope">
+              <router-link
+                class="color: rgb(0, 0, 238);"
+                :to="'/Organization/' + scope.row.hasPermId"
+                >{{ scope.row.hasPermId }}</router-link
+              >
+            </template>
+          </el-table-column>
           <el-table-column prop="uri" label="uri" />
           <el-table-column prop="organization-name" label="组织名称" />
           <el-table-column prop="hasIPODate" label="上市时间" />
@@ -43,40 +51,6 @@ export default {
     return {
       list: null,
       listLoading: false,
-      genre_options: [
-        "",
-        "Action",
-        "Adventure",
-        "Science Fiction",
-        "Suspense",
-        "Comedy",
-        "Drama",
-        "Fantasy",
-        "Horror",
-        "Arts",
-        "Culture",
-        "Entertainment",
-        "Special Interest",
-        "Kids",
-        "Sports",
-        "Documentary",
-        "Romance",
-        "Western",
-        "Military  War",
-        "Music Videos  Concerts",
-        "Arthouse",
-        "Animation",
-        "Historical",
-        "Young Adult Audience",
-        "LGBTQ",
-        "International",
-        "Anime",
-        "Faith  Spirituality",
-        "Unscripted",
-        "Fitness",
-        "Talk Show  Variety",
-        "Erotic",
-      ],
       form: {
         name: "",
         title: "",
@@ -97,26 +71,37 @@ export default {
       },
     };
   },
+  computed: {
+    name() {
+      return this.$route.params.name;
+    },
+  },
+  async created() {
+    if (!this.name) {
+      return;
+    }
+    this.form.name = this.name;
+    await this.fetchData(this.name);
+  },
   methods: {
     reset() {
       this.listLoading = false;
     },
     submit() {
-      this.fetchData();
-    },
-    fetchData() {
-      this.listLoading = true;
-      let params = {};
-      if (this.form.name) params["name"] = this.form.name;
-      console.log(params);
-      find_organization(params).then((response) => {
-        this.count = response.data.count;
-        this.Data = response.data.data;
-        this.dbtime = {
-          neo4j: response.data.neo4j,
-        };
-        this.listLoading = false;
+      this.$router.push({
+        name: "Org",
+        params: { name: this.form.name },
       });
+    },
+    async fetchData(name) {
+      this.listLoading = true;
+      let res = await find_organization({ name }).then((res) => res.data);
+      this.count = res.count;
+      this.Data = res.data;
+      this.dbtime = {
+        neo4j: res.neo4j,
+      };
+      this.listLoading = false;
     },
   },
 };

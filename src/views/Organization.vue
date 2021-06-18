@@ -6,19 +6,19 @@
         <div class="myform">
           <el-form ref="form" :model="Data" label-width="150px">
             <el-form-item label="URI">
-              <el-input :value="Data.uri" />
+              <span> {{ Data.uri }} </span>
             </el-form-item>
             <el-form-item label="组织名称">
-              <el-input :value="Data['organization-name']" />
+              <span> {{ Data["organization-name"] }} </span>
             </el-form-item>
             <el-form-item label="注册地址">
-              <el-input :value="this.esc(Data.RegisteredAddress)" />
+              <span> {{ this.esc(Data.RegisteredAddress) }} </span>
             </el-form-item>
             <el-form-item label="成立时间">
-              <el-input :value="Data.hasLatestOrganizationFoundedDate" />
+              <span> {{ Data.hasLatestOrganizationFoundedDate }} </span>
             </el-form-item>
             <el-form-item label="IPO时间">
-              <el-input :value="Data.hasIPODate" />
+              <span> {{ Data.hasIPODate }} </span>
             </el-form-item>
           </el-form>
         </div>
