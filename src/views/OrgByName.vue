@@ -1,7 +1,7 @@
 <template>
-  <div id="movie-querier">
+  <div class="movie-querier">
     <div class="rule">
-      <h1 style="margin: 55px 30px 20px">组织模糊查询</h1>
+      <h1 class="title">组织模糊查询</h1>
       <div class="content">
         <div class="myform">
           <el-form ref="form" :model="form" label-position="left" label-width="100px">
@@ -19,10 +19,10 @@
       </div>
     </div>
     <div id="result">
-      <h1 style="margin: 55px 30px 20px" v-if="count >= 0">
+      <h1 class="title" v-if="count >= 0">
         共查询到{{ count }}条结果
       </h1>
-      <div style="display: flex; justify-content: center; margin: 0 30px">
+      <div class="table">
         <el-table :data="Data" height="550" stripe style="width: 100%">
           <el-table-column label="ID">
             <template slot-scope="scope">

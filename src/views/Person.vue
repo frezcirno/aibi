@@ -1,5 +1,5 @@
 <template>
-  <div id="movie-querier" style="padding: 30px">
+  <div class="movie-querier" style="padding: 30px">
     <div class="rule">
       <h1 style="margin: 25px auto 20px">人员查询</h1>
       <div class="content">

@@ -6,6 +6,15 @@
 
 <script>
 export default {
-  name: 'App'
-}
+  name: "App",
+};
 </script>
+
+<style>
+.movie-querier {
+  padding: 30px;
+}
+.title {
+  margin: 20px auto 25px;
+}
+</style>

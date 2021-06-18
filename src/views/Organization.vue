@@ -1,10 +1,15 @@
 <template>
-  <div id="movie-querier">
+  <div class="movie-querier">
     <div class="rule">
-      <h1 style="margin: 55px 30px 20px">组织查询</h1>
+      <h1 class="title">组织查询</h1>
       <div class="content">
         <div class="myform">
-          <el-form ref="form" :model="Data" label-position="left" label-width="100px">
+          <el-form
+            ref="form"
+            :model="Data"
+            label-position="left"
+            label-width="100px"
+          >
             <el-form-item label="PermId">
               <span> {{ Data.hasPermId }} </span>
             </el-form-item>
@@ -28,10 +33,8 @@
       </div>
     </div>
     <div id="result">
-      <h1 style="margin: 55px 30px 20px" v-if="count >= 0">
-        关系人查询：{{ count }}条结果
-      </h1>
-      <div style="display: flex; justify-content: center; margin: 0 30px">
+      <h1 class="title" v-if="count >= 0">关系人查询：{{ count }}条结果</h1>
+      <div class="table">
         <el-table
           :data="Person"
           height="550"

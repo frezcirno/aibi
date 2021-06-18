@@ -1,7 +1,7 @@
 <template>
   <div id="movie-querier">
     <div class="rule">
-      <h1 style="margin: 55px 30px 20px">合作关系查询</h1>
+      <h1 class="title">合作关系查询</h1>
       <div class="content">
         <div class="myform">
           <el-form ref="form" :model="form" label-width="150px">
@@ -28,7 +28,7 @@
       <h1 style="margin: 55px 30px 20px" v-if="count">
         共查询到{{ count }}条结果
       </h1>
-      <div style="display: flex; justify-content: center; margin: 0 30px">
+      <div class="table">
         <el-table :data="movieData" height="550" stripe style="width: 100%">
           <el-table-column prop="asin" label="电影ID" width="150" />
           <el-table-column prop="title" label="电影名称" width="150" />
