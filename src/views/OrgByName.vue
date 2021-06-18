@@ -4,7 +4,7 @@
       <h1 style="margin: 55px 30px 20px">组织模糊查询</h1>
       <div class="content">
         <div class="myform">
-          <el-form ref="form" :model="form" label-width="150px">
+          <el-form ref="form" :model="form" label-position="left" label-width="100px">
             <el-form-item label="组织名称">
               <el-input v-model="form.name" placeholder="组织名称" />
             </el-form-item>
@@ -27,7 +27,7 @@
           <el-table-column label="ID">
             <template slot-scope="scope">
               <router-link
-                class="color: rgb(0, 0, 238);"
+                style="color: rgb(0, 0, 238)"
                 :to="'/Organization/' + scope.row.hasPermId"
                 >{{ scope.row.hasPermId }}</router-link
               >
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { find_organization } from "@/api";
+import { neo4j_sql } from "@/api";
 
 export default {
   data() {
@@ -95,7 +95,9 @@ export default {
     },
     async fetchData(name) {
       this.listLoading = true;
-      let res = await find_organization({ name }).then((res) => res.data);
+      let res = await neo4j_sql({
+        cypher: `MATCH (n:Organization) WHERE ANY (name IN n.\`organization-name\` WHERE name CONTAINS "${name}") RETURN n LIMIT 25`,
+      }).then((res) => res.data);
       this.count = res.count;
       this.Data = res.data;
       this.dbtime = {

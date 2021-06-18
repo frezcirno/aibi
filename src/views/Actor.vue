@@ -4,7 +4,7 @@
       <h1 style="margin: 55px 30px 20px">合作关系查询</h1>
       <div class="content">
         <div class="myform">
-          <el-form ref="form" :model="form" label-width="100px">
+          <el-form ref="form" :model="form" label-width="150px">
             <el-form-item label="导演名字">
               <el-input v-model="form.director" placeholder="导演名字" />
             </el-form-item>
@@ -14,7 +14,7 @@
             <el-form-item label="参演名字">
               <el-input v-model="form.support_actor" placeholder="参演名字" />
             </el-form-item>
-            <el-form-item>
+            <el-form-item label-position="left" label-width="80px">
               <el-button type="primary" @click="submit" :loading="searching">
                 Search
               </el-button>

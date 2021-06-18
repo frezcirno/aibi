@@ -80,12 +80,5 @@ def api_query():
     return timed_query(cypher)
 
 
-@app.route('/api/organization', methods=['GET'])
-def query_organization():
-    name = request.args.get("name")
-    cypher = 'MATCH (n:Organization) WHERE ANY (name IN n.`organization-name` WHERE name CONTAINS $name) RETURN n LIMIT 25'
-    return timed_query(cypher, name=name)
-
-
 if __name__ == "__main__":
     app.run(port=8080, debug=True)

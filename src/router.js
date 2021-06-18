@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import PassThrough from '@/PassThrough'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -40,32 +41,50 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/Organization',
     children: [
       {
-        name: 'Dashboard',
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        meta: { title: 'Dashboard', icon: 'dashboard' }
-      },
-      {
         name: 'Organization',
-        path: 'Organization/:hasPermId',
-        component: () => import('@/views/Organization.vue'),
-        meta: { title: '组织查询', icon: 'table' }
+        path: 'Organization',
+        component: PassThrough,
+        meta: { title: '组织查询', icon: 'el-icon-zoom-in' },
+        redirect: '/Organization/Detail',
+        children: [
+          {
+            name: 'Detail',
+            path: 'Detail/:hasPermId?',
+            component: () => import('@/views/Organization.vue'),
+            meta: { title: '组织信息查询', icon: 'table' }
+          },
+          {
+            name: 'Fuzzy',
+            path: 'Fuzzy/:name?',
+            component: () => import('@/views/OrgByName.vue'),
+            meta: { title: '组织名称模糊查询', icon: 'table' }
+          },
+        ]
       },
       {
         name: 'Person',
-        path: 'Person/:hasPermId',
-        component: () => import('@/views/Person.vue'),
-        meta: { title: '人员查询', icon: 'table' }
-      },
-      {
-        name: 'Org',
-        path: 'Org/:name',
-        component: () => import('@/views/Org.vue'),
-        meta: { title: '组织模糊查询', icon: 'table' }
-      },
+        path: 'Person',
+        component: PassThrough,
+        meta: { title: '人员查询', icon: 'user' },
+        redirect: '/Person/Detail',
+        children: [
+          {
+            name: 'Detail',
+            path: 'Detail/:hasPermId?',
+            component: () => import('@/views/Person.vue'),
+            meta: { title: '人员信息查询', icon: 'user' }
+          },
+          {
+            name: 'Fuzzy',
+            path: 'Fuzzy/:name?',
+            component: () => import('@/views/PerByName.vue'),
+            meta: { title: '人名模糊查询', icon: 'user' }
+          },
+        ]
+      }
     ]
   },
   // 404 page must be placed at the end !!!
