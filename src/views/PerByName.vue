@@ -1,6 +1,6 @@
 <template>
   <div class="movie-querier">
-    <div>
+    <div class="rule">
       <h1 class="title">人员模糊查询</h1>
       <div class="content">
         <div class="myform">
@@ -35,26 +35,30 @@
     <div id="result">
       <h1 class="title" v-if="count >= 0">共查询到{{ count }}条结果</h1>
       <div class="table">
-        <el-table :data="Data" height="550" stripe style="width: 100%">
+        <el-table :data="TableData" height="550" stripe style="width: 100%">
           <el-table-column label="ID">
             <template slot-scope="scope">
               <router-link
                 style="color: rgb(0, 0, 238)"
-                :to="'/Person/' + scope.row.hasPermId"
-                >{{ scope.row.hasPermId }}</router-link
+                :to="'/Person/Detail/' + scope.row.properties.hasPermId"
+                >{{ scope.row.properties.hasPermId }}</router-link
               >
             </template>
           </el-table-column>
-          <el-table-column prop="uri" label="uri" />
-          <el-table-column prop="honorific-prefix" label="前缀" width="50" />
+          <el-table-column prop="properties.uri" label="uri" />
+          <el-table-column
+            prop="properties.honorific-prefix"
+            label="前缀"
+            width="50"
+          />
           <el-table-column label="姓名">
             <template slot-scope="scope">
               {{
-                scope.row["family-name"] +
-                ((scope.row["additional-name"] && " ") || "") +
-                (scope.row["additional-name"] || "") +
+                scope.row.properties["family-name"] +
+                ((scope.row.properties["additional-name"] && " ") || "") +
+                (scope.row.properties["additional-name"] || "") +
                 " " +
-                scope.row["given-name"]
+                scope.row.properties["given-name"]
               }}
             </template>
           </el-table-column>
@@ -77,7 +81,7 @@ export default {
         "additional-name": "",
         "given-name": "",
       },
-      Data: [],
+      TableData: [],
       count: 0,
       dbtime: {
         neo4j: 100,
@@ -85,9 +89,6 @@ export default {
     };
   },
   computed: {
-    name() {
-      return this.$route.params.name;
-    },
     familyName() {
       return this.$route.params.name.split(",")[0];
     },
@@ -142,7 +143,7 @@ export default {
         )} RETURN n LIMIT 25`,
       }).then((res) => res.data);
       this.count = res.count;
-      this.Data = res.data;
+      this.TableData = res.data;
       this.dbtime = {
         neo4j: res.neo4j,
       };

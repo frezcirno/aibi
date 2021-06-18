@@ -26,20 +26,26 @@
     <div id="result">
       <h1 class="title" v-if="count >= 0">共查询到{{ count }}条结果</h1>
       <div class="table">
-        <el-table :data="Data" height="550" stripe style="width: 100%">
-          <el-table-column label="ID">
+        <el-table :data="TableData" height="550" stripe style="width: 100%">
+          <el-table-column label="PermId">
             <template slot-scope="scope">
               <router-link
                 style="color: rgb(0, 0, 238)"
-                :to="'/Organization/' + scope.row.hasPermId"
-                >{{ scope.row.hasPermId }}</router-link
+                :to="'/Organization/Detail/' + scope.row.properties.hasPermId"
+                >{{ scope.row.properties.hasPermId }}</router-link
               >
             </template>
           </el-table-column>
-          <el-table-column prop="uri" label="uri" />
-          <el-table-column prop="organization-name" label="组织名称" />
-          <el-table-column prop="hasIPODate" label="上市时间" />
-          <el-table-column prop="RegisteredAddress" label="注册地址" />
+          <el-table-column prop="properties.uri" label="uri" />
+          <el-table-column
+            prop="properties.organization-name"
+            label="组织名称"
+          />
+          <el-table-column prop="properties.hasIPODate" label="上市时间" />
+          <el-table-column
+            prop="properties.RegisteredAddress"
+            label="注册地址"
+          />
         </el-table>
       </div>
     </div>
@@ -67,7 +73,7 @@ export default {
         weekday: "",
         support_actor: "",
       },
-      Data: [],
+      TableData: [],
       count: 0,
       dbtime: {
         neo4j: 100,
@@ -102,7 +108,7 @@ export default {
         cypher: `MATCH (n:Organization) WHERE ANY (name IN n.\`organization-name\` WHERE name CONTAINS "${name}") RETURN n LIMIT 25`,
       }).then((res) => res.data);
       this.count = res.count;
-      this.Data = res.data;
+      this.TableData = res.data;
       this.dbtime = {
         neo4j: res.neo4j,
       };

@@ -1,32 +1,32 @@
 <template>
-  <div class="movie-querier" style="padding: 30px">
+  <div class="movie-querier">
     <div class="rule">
-      <h1 style="margin: 25px auto 20px">人员查询</h1>
+      <h1 class="title">人员查询</h1>
       <div class="content">
         <div class="myform">
           <el-form
             ref="form"
-            :model="Data"
+            :model="PersonData.properties"
             label-position="left"
             label-width="100px"
           >
             <el-form-item label="PermId">
-              <span> {{ Data.hasPermId }} </span>
+              <span> {{ PersonData.properties.hasPermId }} </span>
             </el-form-item>
             <el-form-item label="URI">
-              <span> {{ Data.uri }} </span>
+              <span> {{ PersonData.properties.uri }} </span>
             </el-form-item>
             <el-form-item label="前缀">
-              <span> {{ Data["honorific-prefix"] }} </span>
+              <span> {{ PersonData.properties["honorific-prefix"] }} </span>
             </el-form-item>
             <el-form-item label="姓名">
               <span>
                 {{
-                  Data["family-name"] +
-                  ((Data["additional-name"] && " ") || "") +
-                  (Data["additional-name"] || "") +
+                  PersonData.properties["family-name"] +
+                  ((PersonData.properties["additional-name"] && " ") || "") +
+                  (PersonData.properties["additional-name"] || "") +
                   " " +
-                  Data["given-name"]
+                  PersonData.properties["given-name"]
                 }}
               </span>
             </el-form-item>
@@ -40,7 +40,7 @@
       </h1>
       <div style="display: flex; justify-content: center">
         <el-table
-          :data="Organization"
+          :data="OrganizationDataList"
           height="550"
           stripe
           style="width: 100%"
@@ -53,7 +53,7 @@
             <template slot-scope="scope">
               <router-link
                 style="color: rgb(0, 0, 238)"
-                :to="'/Organization/' + scope.row.hasPermId"
+                :to="'/Organization/Detail/' + scope.row.hasPermId"
                 >{{ scope.row.hasPermId }}</router-link
               >
             </template>
@@ -77,13 +77,13 @@ export default {
     return {
       list: null,
       listLoading: false,
-      Data: {},
-      Organization: [],
+      PersonData: {},
+      OrganizationDataList: [],
     };
   },
   computed: {
     count() {
-      return this.Organization.length;
+      return this.OrganizationDataList.length;
     },
     hasPermId() {
       console.log(this.$route.params.hasPermId);
@@ -95,16 +95,16 @@ export default {
       (await neo4j_sql({
         cypher: `MATCH (n:Person) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
       }).then((res) => res.data)) || {};
-    this.Data = res.data[0];
-    res =
+    this.PersonData = res.data[0];
+    let res1 =
       (await neo4j_sql({
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
-    this.Organization = res.data.map((x) => this.getOrganizationAndType(x));
+    this.OrganizationDataList = res1.data.map((x) => this.getProperties(x));
   },
   methods: {
-    getOrganizationAndType(path) {
-      return { ...path.nodes[1], ...path.nodes[2] };
+    getProperties(path) {
+      return { ...path.nodes[1].properties, ...path.end_node.properties };
     },
     esc(s) {
       if (typeof s == "string") {

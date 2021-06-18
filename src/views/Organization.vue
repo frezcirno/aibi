@@ -6,27 +6,31 @@
         <div class="myform">
           <el-form
             ref="form"
-            :model="Data"
+            :model="FormData.properties"
             label-position="left"
             label-width="100px"
           >
             <el-form-item label="PermId">
-              <span> {{ Data.hasPermId }} </span>
+              <span> {{ FormData.properties.hasPermId }} </span>
             </el-form-item>
             <el-form-item label="URI">
-              <span> {{ Data.uri }} </span>
+              <span> {{ FormData.properties.uri }} </span>
             </el-form-item>
             <el-form-item label="组织名称">
-              <span> {{ Data["organization-name"] }} </span>
+              <span> {{ FormData.properties["organization-name"] }} </span>
             </el-form-item>
             <el-form-item label="注册地址">
-              <span> {{ this.esc(Data.RegisteredAddress) }} </span>
+              <span>
+                {{ this.esc(FormData.properties.RegisteredAddress) }}
+              </span>
             </el-form-item>
             <el-form-item label="成立时间">
-              <span> {{ Data.hasLatestOrganizationFoundedDate }} </span>
+              <span>
+                {{ FormData.properties.hasLatestOrganizationFoundedDate }}
+              </span>
             </el-form-item>
             <el-form-item label="IPO时间">
-              <span> {{ Data.hasIPODate }} </span>
+              <span> {{ FormData.properties.hasIPODate }} </span>
             </el-form-item>
           </el-form>
         </div>
@@ -36,7 +40,7 @@
       <h1 class="title" v-if="count >= 0">关系人查询：{{ count }}条结果</h1>
       <div class="table">
         <el-table
-          :data="Person"
+          :data="PersonDataList"
           height="550"
           stripe
           style="width: 100%"
@@ -49,7 +53,7 @@
             <template slot-scope="scope">
               <router-link
                 style="color: rgb(0, 0, 238)"
-                :to="'/Person/' + scope.row.hasPermId"
+                :to="'/Person/Detail/' + scope.row.hasPermId"
                 >{{ scope.row.hasPermId }}</router-link
               >
             </template>
@@ -84,13 +88,13 @@ export default {
     return {
       list: null,
       listLoading: false,
-      Data: {},
-      Person: [],
+      FormData: {},
+      PersonDataList: [],
     };
   },
   computed: {
     count() {
-      return this.Person.length;
+      return this.PersonDataList.length;
     },
     hasPermId() {
       return this.$route.params.hasPermId;
@@ -101,16 +105,17 @@ export default {
       (await neo4j_sql({
         cypher: `MATCH (n:Organization) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
       }).then((res) => res.data)) || {};
-    this.Data = res.data[0];
-    res =
+    this.FormData = res.data[0];
+    let res1 =
       (await neo4j_sql({
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
-    this.Person = res.data.map((x) => this.getPersonAndType(x));
+    this.PersonDataList = res1.data.map((x) => this.getProperties(x));
   },
   methods: {
-    getPersonAndType(path) {
-      return { ...path.nodes[1], ...path.nodes[0] };
+    getProperties(path) {
+      // middle point comes first
+      return { ...path.nodes[1].properties, ...path.start_node.properties };
     },
     esc(s) {
       if (typeof s == "string") {

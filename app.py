@@ -42,11 +42,18 @@ class ProcessError(RuntimeError):
 
 def preprocess(x):
     if isinstance(x, Node):
-        return dict(x)
+        return {"id": x.id, 'labels': list(x.labels), 'properties': x._properties}
     elif isinstance(x, Relationship):
-        return {'id': x.id, 'type': x.type, 'nodes': [preprocess(n) for n in x.nodes]}
+        return {'id': x.id,
+                'type': x.type,
+                'start_node': preprocess(x.start_node),
+                'end_node': preprocess(x.end_node),
+                'nodes': [preprocess(n) for n in x.nodes]}
     elif isinstance(x, Path):
-        return {'nodes': [preprocess(n) for n in x.nodes], 'relationships': [preprocess(r) for r in x.relationships]}
+        return {'start_node': preprocess(x.start_node),
+                'end_node': preprocess(x.end_node),
+                'nodes': [preprocess(n) for n in x.nodes],
+                'relationships': [preprocess(r) for r in x.relationships]}
     else:
         raise ProcessError()
 
