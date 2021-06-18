@@ -6,27 +6,27 @@
         <div class="myform">
           <el-form
             ref="form"
-            :model="PersonData.properties"
+            :model="PersonData"
             label-position="left"
             label-width="100px"
           >
             <el-form-item label="PermId">
-              <span> {{ PersonData.properties.hasPermId }} </span>
+              <span> {{ PersonData.hasPermId }} </span>
             </el-form-item>
             <el-form-item label="URI">
-              <span> {{ PersonData.properties.uri }} </span>
+              <span> {{ PersonData.uri }} </span>
             </el-form-item>
             <el-form-item label="前缀">
-              <span> {{ PersonData.properties["honorific-prefix"] }} </span>
+              <span> {{ PersonData["honorific-prefix"] }} </span>
             </el-form-item>
             <el-form-item label="姓名">
               <span>
                 {{
-                  PersonData.properties["family-name"] +
-                  ((PersonData.properties["additional-name"] && " ") || "") +
-                  (PersonData.properties["additional-name"] || "") +
+                  PersonData["family-name"] +
+                  ((PersonData["additional-name"] && " ") || "") +
+                  (PersonData["additional-name"] || "") +
                   " " +
-                  PersonData.properties["given-name"]
+                  PersonData["given-name"]
                 }}
               </span>
             </el-form-item>
@@ -91,11 +91,10 @@ export default {
     },
   },
   async created() {
-    let res =
-      (await neo4j_sql({
-        cypher: `MATCH (n:Person) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
-      }).then((res) => res.data)) || {};
-    this.PersonData = res.data[0];
+    let res = await neo4j_sql({
+      cypher: `MATCH (n:Person) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
+    }).then((res) => res.data);
+    this.PersonData = res.data[0]?.properties || {};
     let res1 =
       (await neo4j_sql({
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,

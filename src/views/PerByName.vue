@@ -8,7 +8,7 @@
             ref="form"
             :model="form"
             label-position="left"
-            label-width="100px"
+            label-width="170px"
           >
             <el-form-item label="姓 (family-name)">
               <el-input v-model="form['family-name']" placeholder="姓" />

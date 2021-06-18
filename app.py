@@ -42,7 +42,10 @@ class ProcessError(RuntimeError):
 
 def preprocess(x):
     if isinstance(x, Node):
-        return {"id": x.id, 'labels': list(x.labels), 'properties': x._properties}
+        labels = list(x.labels)
+        if 'Resource' in labels:
+            labels.remove('Resource')
+        return {"id": x.id, 'labels': labels, 'properties': x._properties}
     elif isinstance(x, Relationship):
         return {'id': x.id,
                 'type': x.type,

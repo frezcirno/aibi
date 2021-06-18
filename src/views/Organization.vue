@@ -6,31 +6,31 @@
         <div class="myform">
           <el-form
             ref="form"
-            :model="FormData.properties"
+            :model="FormData"
             label-position="left"
             label-width="100px"
           >
             <el-form-item label="PermId">
-              <span> {{ FormData.properties.hasPermId }} </span>
+              <span> {{ FormData.hasPermId }} </span>
             </el-form-item>
             <el-form-item label="URI">
-              <span> {{ FormData.properties.uri }} </span>
+              <span> {{ FormData.uri }} </span>
             </el-form-item>
             <el-form-item label="组织名称">
-              <span> {{ FormData.properties["organization-name"] }} </span>
+              <span> {{ FormData["organization-name"] }} </span>
             </el-form-item>
             <el-form-item label="注册地址">
               <span>
-                {{ this.esc(FormData.properties.RegisteredAddress) }}
+                {{ this.esc(FormData.RegisteredAddress) }}
               </span>
             </el-form-item>
             <el-form-item label="成立时间">
               <span>
-                {{ FormData.properties.hasLatestOrganizationFoundedDate }}
+                {{ FormData.hasLatestOrganizationFoundedDate }}
               </span>
             </el-form-item>
             <el-form-item label="IPO时间">
-              <span> {{ FormData.properties.hasIPODate }} </span>
+              <span> {{ FormData.hasIPODate }} </span>
             </el-form-item>
           </el-form>
         </div>
@@ -101,11 +101,10 @@ export default {
     },
   },
   async created() {
-    let res =
-      (await neo4j_sql({
-        cypher: `MATCH (n:Organization) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
-      }).then((res) => res.data)) || {};
-    this.FormData = res.data[0];
+    let res = await neo4j_sql({
+      cypher: `MATCH (n:Organization) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
+    }).then((res) => res.data);
+    this.FormData = res.data[0]?.properties || {};
     let res1 =
       (await neo4j_sql({
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
