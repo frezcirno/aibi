@@ -1,6 +1,7 @@
 from time import perf_counter
 import json
 from json import JSONEncoder
+import redis
 from datetime import datetime
 
 from flask.helpers import make_response
@@ -10,6 +11,7 @@ from neo4j.graph import Path, Node, Relationship
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+r = redis.Redis(host='7c00h.xyz', port=6379, password='tanzixuan', db=2)
 driver = GraphDatabase.driver("neo4j://7c00h.xyz:7687", auth=("neo4j", "root"))
 # session = driver.session()
 
@@ -62,6 +64,13 @@ def preprocess(x):
 
 
 def timed_query(cypher, **param):
+    if r.exists(cypher):
+        print('cached!')
+        data = r.get(cypher)
+        resp = make_response(data)
+        resp.headers['content-type'] = 'application/json; charset=utf-8'
+        return resp
+
     start = perf_counter()
     res = neo4j_query(cypher, **param)
     time = 1000 * (perf_counter() - start)
@@ -73,6 +82,7 @@ def timed_query(cypher, **param):
         separators=(',', ':'),
         cls=CustomJSONEncoder
     )
+    r.setex(cypher, 10 * 60, data)  # cache for 10 mins
     resp = make_response(data)
     resp.headers['content-type'] = 'application/json; charset=utf-8'
     return resp
