@@ -30,6 +30,9 @@
                 }}
               </span>
             </el-form-item>
+            <el-form-item label="评分">
+              <span> {{ score + " / 5.0" }} </span>
+            </el-form-item>
           </el-form>
         </div>
       </div>
@@ -89,7 +92,7 @@
 </template>
 
 <script>
-import { neo4j_sql } from "@/api";
+import { neo4j_sql, pscore } from "@/api";
 
 export default {
   data() {
@@ -99,6 +102,7 @@ export default {
       PersonData: {},
       EduDataList: [],
       OrganizationDataList: [],
+      score: 0.0,
     };
   },
   computed: {
@@ -127,23 +131,34 @@ export default {
     this.PersonData = res.data[0]?.properties || {};
     let res1 =
       (await neo4j_sql({
-        cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
+        cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization)-[]-(q:Quote) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
-    this.OrganizationDataList = res1.data.map((x) => this.getProperties(x));
+    this.OrganizationDataList = res1.data.map((x) => ({
+      ...x.nodes[1].properties,
+      ...x.nodes[2].properties,
+    }));
     let res2 =
       (await neo4j_sql({
         cypher: `MATCH path=(p:Person)-[]-(a:AcademicQualification)-[]-(ad:AcademicDegree) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
-    console.log(res2);
     this.EduDataList = res2.data.map((x) => ({
       ...x.nodes[1].properties,
-      ...x.end_node.properties,
+      ...x.nodes[2].properties,
     }));
+    this.score = await pscore(
+      res1.data.map((x) => x.nodes[3].properties.hasExchangeTicker),
+      res2.data.reduce((o, x) => {
+        let degree = x.nodes[2].properties.prefLabel.toLowerCase();
+        if (degree.indexOf("doctor") != -1) {
+          return o + 3.0;
+        } else if (degree.indexOf("master") != -1) {
+          return o + 2.0;
+        }
+        return o + 1.0;
+      }, 0.0)
+    ).then((res) => res.data.score);
   },
   methods: {
-    getProperties(path) {
-      return { ...path.nodes[1].properties, ...path.end_node.properties };
-    },
     esc(s) {
       if (typeof s == "string") {
         return s.replaceAll("\n", " ");

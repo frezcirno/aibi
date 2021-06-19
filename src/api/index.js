@@ -29,6 +29,16 @@ export function neo4j_psn(hasPermId) {
   })
 }
 
-export function combine_product() {
-  return {};
+export function oscore(ticker) {
+  return request({
+    url: '/api/oscore',
+    params: { ticker }
+  });
+}
+
+export function pscore(tickers, edu) {
+  return request({
+    url: '/api/pscore',
+    params: { tickers, edu }
+  });
 }

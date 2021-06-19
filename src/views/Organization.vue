@@ -33,7 +33,7 @@
               <span> {{ FormData.hasIPODate }} </span>
             </el-form-item>
             <el-form-item label="综合评分">
-              <span> {{ FormData.score }} </span>
+              <span> {{ score + " / 10.0" }} </span>
             </el-form-item>
           </el-form>
         </div>
@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import { neo4j_sql } from "@/api";
+import { neo4j_sql, oscore } from "@/api";
 
 export default {
   data() {
@@ -137,6 +137,7 @@ export default {
       QuoteData: {},
       InstruData: {},
       PersonDataList: [],
+      score: 0.0,
     };
   },
   computed: {
@@ -168,6 +169,9 @@ export default {
       cypher: `MATCH (q:Quote)-[]-(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN q LIMIT 1`,
     }).then((res) => res.data);
     this.QuoteData = res2.data[0]?.properties || {};
+    this.score = await oscore(this.QuoteData.hasExchangeTicker).then(
+      (res) => res.data.score
+    );
     let res3 = await neo4j_sql({
       cypher: `MATCH (i:Instrument)-[]-(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN i LIMIT 1`,
     }).then((res) => res.data);

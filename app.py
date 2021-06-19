@@ -1,3 +1,5 @@
+import math
+import yfinance as yf
 from time import perf_counter
 import json
 from json import JSONEncoder
@@ -13,10 +15,46 @@ from flask_cors import CORS
 
 r = redis.Redis(host='7c00h.xyz', port=6379, password='tanzixuan', db=2)
 driver = GraphDatabase.driver("neo4j://7c00h.xyz:7687", auth=("neo4j", "root"))
-# session = driver.session()
 
 app = Flask(__name__)
 CORS(app)
+
+
+def ScoreforO(ticker: str) -> int:
+    msft = yf.Ticker(ticker)
+    df = msft.get_financials(proxy='http://7c00h.xyz:7890')
+    if df.empty:
+        return 5.0
+    items = ["Income Before Tax", ""]
+    weight = [0.55, 0.15, 0.05, 0.05, 0.1, 0.1]
+    fin = []
+    i = df.loc["Income Before Tax"]
+    fin.append((i.sum()-i.min()*4)/(i.max()-i.min()))
+    #i=df.loc["Total Revenue"]/df.loc["Total Revenue"]
+    return fin[0]
+
+
+@app.route('/api/oscore')
+def api_oscore():
+    ticker = request.args.get('ticker')
+    return {'score': ScoreforO(ticker)}
+
+
+def ScoreforI(tickers: list, edu: int) -> int:
+    score = 0
+    for i in tickers:
+        score += ScoreforO(i)
+    edu = edu/1.6
+    score = (math.exp(score)/(math.exp(score)+1)-0.5)*16
+    lscore = (math.exp(edu)/(math.exp(edu)+1)-0.5)*2
+    return {'score': score+lscore}
+
+
+@app.route('/api/pscore')
+def api_pscore():
+    tickers = request.args.get('tickers')
+    edu = request.args.get('edu')
+    return ScoreforI(tickers, edu)
 
 
 def query(tx, cypher, **param):
