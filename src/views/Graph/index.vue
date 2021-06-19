@@ -53,6 +53,12 @@ export default {
         icons: {
           Person: "user",
           Organization: "building",
+          Officership: "briefcase",
+          Directorship: "briefcase",
+          TenureInOrganization: "briefcase",
+          Resource: "recycle",
+          AcademicQualification: "university",
+          Major: "book",
         },
         /// Bottom Right Corner Image
         // images: {

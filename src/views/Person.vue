@@ -41,7 +41,6 @@
       <div style="display: flex; justify-content: center">
         <el-table
           :data="OrganizationDataList"
-          height="550"
           stripe
           style="width: 100%"
           v-loading="listLoading"
@@ -66,6 +65,26 @@
         </el-table>
       </div>
     </div>
+    <div class="rule">
+      <h1 style="margin: 55px auto 20px" v-if="count >= 0">
+        教育经历查询：{{ eduCount }}条结果
+      </h1>
+      <div style="display: flex; justify-content: center">
+        <el-table
+          :data="EduDataList"
+          stripe
+          style="width: 100%"
+          v-loading="listLoading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(0, 0, 0, 0.8)"
+        >
+          <el-table-column prop="fromInstitutionName" label="学校" />
+          <el-table-column prop="prefLabel" label="学位" />
+          <!-- <el-table-column prop="to" label="to" /> -->
+        </el-table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -78,12 +97,16 @@ export default {
       list: null,
       listLoading: false,
       PersonData: {},
+      EduDataList: [],
       OrganizationDataList: [],
     };
   },
   computed: {
     count() {
       return this.OrganizationDataList.length;
+    },
+    eduCount() {
+      return this.EduDataList.length;
     },
     hasPermId() {
       console.log(this.$route.params.hasPermId);
@@ -100,6 +123,15 @@ export default {
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
     this.OrganizationDataList = res1.data.map((x) => this.getProperties(x));
+    let res2 =
+      (await neo4j_sql({
+        cypher: `MATCH path=(p:Person)-[]-(a:AcademicQualification)-[]-(ad:AcademicDegree) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
+      }).then((res) => res.data)) || [];
+    console.log(res2);
+    this.EduDataList = res2.data.map((x) => ({
+      ...x.nodes[1].properties,
+      ...x.end_node.properties,
+    }));
   },
   methods: {
     getProperties(path) {

@@ -26,7 +26,7 @@
     <div id="result">
       <h1 class="title" v-if="count >= 0">共查询到{{ count }}条结果</h1>
       <div class="table">
-        <el-table :data="TableData" height="550" stripe style="width: 100%">
+        <el-table :data="TableData" stripe style="width: 100%">
           <el-table-column label="PermId">
             <template slot-scope="scope">
               <router-link

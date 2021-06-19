@@ -32,6 +32,9 @@
             <el-form-item label="IPO时间">
               <span> {{ FormData.hasIPODate }} </span>
             </el-form-item>
+            <el-form-item label="综合评分">
+              <span> {{ FormData.score }} </span>
+            </el-form-item>
           </el-form>
         </div>
       </div>
@@ -41,7 +44,6 @@
       <div class="table">
         <el-table
           :data="PersonDataList"
-        
           stripe
           style="width: 100%"
           v-loading="listLoading"
@@ -77,30 +79,49 @@
         </el-table>
       </div>
     </div>
+    <div id="PrimaryInstuments">
+      <h1 class="title">主要设备</h1>
+      <div class="content">
+        <div class="myform">
+          <el-form
+            ref="form"
+            :model="InstruData"
+            label-position="left"
+            label-width="100px"
+          >
+            <el-form-item label="名称">
+              <span> {{ InstruData.hasName }} </span>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </div>
     <div id="PrimaryQuote">
       <h1 class="title">主要报价</h1>
       <div class="content">
         <div class="myform">
           <el-form
             ref="form"
-            :model="FormData"
+            :model="QuoteData"
             label-position="left"
             label-width="100px"
           >
+            <el-form-item label="股票名称">
+              <span> {{ QuoteData.hasName }} </span>
+            </el-form-item>
             <el-form-item label="RIC">
-              <span> {{ FormData.hasPermId }} </span>
+              <span> {{ QuoteData.hasRic }} </span>
             </el-form-item>
             <el-form-item label="股票代码">
-              <span> {{ FormData.uri }} </span>
+              <span> {{ QuoteData.hasExchangeTicker }} </span>
             </el-form-item>
-            <el-form-item label="交换">
-              <span> {{ FormData["organization-name"] }} </span>
-            </el-form-item>           
+            <el-form-item label="交换代码">
+              <span> {{ QuoteData.hasExchangeCode }} </span>
+            </el-form-item>
           </el-form>
         </div>
       </div>
-        
-     </div> 
+    </div>
   </div>
 </template>
 
@@ -113,6 +134,8 @@ export default {
       list: null,
       listLoading: false,
       FormData: {},
+      QuoteData: {},
+      InstruData: {},
       PersonDataList: [],
     };
   },
@@ -134,11 +157,14 @@ export default {
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
     this.PersonDataList = res1.data.map((x) => this.getProperties(x));
-    let res2 =
-      (await neo4j_sql({
-        cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
-      }).then((res) => res.data)) || [];
-    this.QuoteDataList = res2.data.map((x) => this.getProperties(x));
+    let res2 = await neo4j_sql({
+      cypher: `MATCH (q:Quote)-[]-(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN q LIMIT 1`,
+    }).then((res) => res.data);
+    this.QuoteData = res2.data[0]?.properties || {};
+    let res3 = await neo4j_sql({
+      cypher: `MATCH (i:Instrument)-[]-(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN i LIMIT 1`,
+    }).then((res) => res.data);
+    this.InstruData = res3.data[0]?.properties || {};
   },
   methods: {
     getProperties(path) {
