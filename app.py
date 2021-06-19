@@ -45,7 +45,7 @@ def ScoreforI(tickers: list, edu: int) -> int:
     for i in tickers:
         score += ScoreforO(i)
     edu = edu/1.6
-    score = (math.exp(score)/(math.exp(score)+1)-0.5)*16
+    score = (math.exp(score)/(math.exp(score)+1)-0.5)*8
     lscore = (math.exp(edu)/(math.exp(edu)+1)-0.5)*2
     return {'score': score+lscore}
 
