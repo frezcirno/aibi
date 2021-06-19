@@ -114,6 +114,13 @@ export default {
     },
   },
   async created() {
+    if (!this.hasPermId) {
+      this.$notify.error({
+        title: "参数错误",
+        message: "请首先进行模糊查询或手动输入PermId",
+      });
+      return;
+    }
     let res = await neo4j_sql({
       cypher: `MATCH (n:Person) WHERE n.hasPermId="${this.hasPermId}" RETURN n LIMIT 1`,
     }).then((res) => res.data);

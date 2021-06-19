@@ -82,6 +82,7 @@ export default {
       return false
     },
     resolvePath(routePath) {
+      routePath = routePath.split(':')[0]
       if (isExternal(routePath)) {
         return routePath
       }
