@@ -17,11 +17,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .app-main {
   /*50 = navbar  */
-  /* min-height: calc(100vh - 50px); */
-  height: calc(100vh - 51px);
+  min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
   overflow: hidden;
