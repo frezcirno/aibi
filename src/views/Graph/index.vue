@@ -18,23 +18,25 @@ import "neo4jd3/dist/css/neo4jd3.min.css";
 import Neo4JD3 from "neo4jd3";
 import { neo4j_sql } from "@/api";
 
+var neo4jd3 = {};
+var oNodesDict = new Map();
+var oRelationshipsDict = new Map();
+
 export default {
   name: "Graph",
   data() {
     return {
       cypher: `MATCH p=(n:Person)-[*4]-(m:Person) RETURN p LIMIT 25`,
-      neo4jd3: {},
-      neo4jData: {},
     };
   },
   async created() {
-    this.neo4jData = await this.getData(this.cypher);
-    this.initTree(this.neo4jData);
+    let neo4jData = await this.getData(this.cypher);
+    this.initTree(neo4jData);
   },
   methods: {
     initTree(neo4jData) {
       let that = this;
-      this.neo4jd3 = new Neo4JD3("#graph", {
+      neo4jd3 = new Neo4JD3("#graph", {
         // highlight: [
         //   {
         //     class: "Person",
@@ -89,97 +91,66 @@ export default {
           let id = node.id;
           let cypher = `match p=(n)-[]-() WHERE id(n)=${id} RETURN p LIMIT 25`;
           that.getData(cypher).then((data) => {
-            that.neo4jData = that.merge(neo4jData, data);
-            that.initTree(that.neo4jData);
+            neo4jd3.updateWithNeo4jData(data);
           });
         },
       });
     },
     async getData(cypher) {
       let res = await neo4j_sql({ cypher }).then((res) => res.data);
-      return this.preprocess(res.data);
+      return this.preprocessUnique(res.data);
     },
     async search() {
-      this.neo4jData = await this.getData(this.cypher);
-      this.initTree(this.neo4jData);
+      let neo4jData = await this.getData(this.cypher);
+      this.initTree(neo4jData);
     },
-    preprocess(paths) {
+    preprocessUnique(paths) {
       let nodesDict = new Map();
-      let relationships = [];
+      let relationshipsDict = new Map();
       for (const path of paths) {
         for (const node of path.nodes) {
-          if (!nodesDict.has(node.id)) {
-            if (node.labels.length == 0) {
-              node.labels.push("Resource");
-            }
-            nodesDict.set(node.id, node);
+          if (oNodesDict.has(node.id)) {
+            continue;
           }
+          if (node.labels.length == 0) {
+            node.labels.push("Resource");
+          }
+          nodesDict.set(node.id, node);
+          oNodesDict.set(node.id, node);
         }
         for (const relationship of path.relationships) {
           relationship.startNode = relationship.start_node.id;
-          delete relationship.start_node;
           relationship.endNode = relationship.end_node.id;
+          relationship.properties = {};
+          delete relationship.start_node;
           delete relationship.end_node;
           delete relationship.nodes;
-          relationship.properties = {};
-          if (relationships.every((rel) => rel.id != relationship.id)) {
-            relationships.push(relationship);
-          }
-        }
-      }
 
-      let singleRelationships = [];
-      for (const relationship of relationships) {
-        let ok = true;
-        for (const relationship1 of relationships) {
-          if (
-            (relationship.startNode == relationship1.endNode &&
-              relationship.endNode == relationship1.startNode) ||
-            (relationship.startNode == relationship1.startNode &&
-              relationship.endNode == relationship1.endNode)
-          ) {
-            if (relationship.id > relationship1.id) {
+          if (oRelationshipsDict.has(relationship.id)) {
+            continue;
+          }
+
+          let ok = true;
+          for (const relationship1 of oRelationshipsDict.values()) {
+            if (
+              (relationship.startNode == relationship1.endNode &&
+                relationship.endNode == relationship1.startNode) ||
+              (relationship.startNode == relationship1.startNode &&
+                relationship.endNode == relationship1.endNode)
+            ) {
               ok = false;
               break;
             }
           }
-        }
-        if (ok) {
-          singleRelationships.push(relationship);
+          if (!ok) {
+            continue;
+          }
+
+          relationshipsDict.set(relationship.id, relationship);
+          oRelationshipsDict.set(relationship.id, relationship);
         }
       }
 
-      let nodes = Array.from(nodesDict.values());
-      let graph = { nodes, relationships: singleRelationships };
-      let data = [{ graph }];
-      let columns = [];
-      let results = [{ columns, data }];
-      let res = { results, errors: [] };
-      return res;
-    },
-    merge(data1, data2) {
-      let nodesDict = new Map();
-      let relationshipsDict = new Map();
-      for (const node of data1.results[0].data[0].graph.nodes) {
-        if (!nodesDict.has(node.id)) {
-          nodesDict.set(node.id, node);
-        }
-      }
-      for (const node of data2.results[0].data[0].graph.nodes) {
-        if (!nodesDict.has(node.id)) {
-          nodesDict.set(node.id, node);
-        }
-      }
-      for (const node of data1.results[0].data[0].graph.relationships) {
-        if (!relationshipsDict.has(node.id)) {
-          relationshipsDict.set(node.id, node);
-        }
-      }
-      for (const node of data2.results[0].data[0].graph.relationships) {
-        if (!relationshipsDict.has(node.id)) {
-          relationshipsDict.set(node.id, node);
-        }
-      }
       let nodes = Array.from(nodesDict.values());
       let relationships = Array.from(relationshipsDict.values());
       let graph = { nodes, relationships };
@@ -187,11 +158,6 @@ export default {
       let columns = [];
       let results = [{ columns, data }];
       let res = { results, errors: [] };
-      console.log(data1.results[0].data[0].graph.nodes.length, nodes.length);
-      console.log(
-        data1.results[0].data[0].graph.relationships.length,
-        relationships.length
-      );
       return res;
     },
   },
