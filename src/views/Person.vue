@@ -131,7 +131,7 @@ export default {
     this.PersonData = res.data[0]?.properties || {};
     let res1 =
       (await neo4j_sql({
-        cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization)-[]-(q:Quote) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
+        cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization)-[]-(q:Quote) WHERE p.hasPermId="${this.hasPermId}" RETURN path LIMIT 100`,
       }).then((res) => res.data)) || [];
     this.OrganizationDataList = res1.data.map((x) => ({
       ...x.nodes[1].properties,

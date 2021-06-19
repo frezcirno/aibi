@@ -105,7 +105,7 @@ export default {
     async fetchData(name) {
       this.listLoading = true;
       let res = await neo4j_sql({
-        cypher: `MATCH (n:Organization) WHERE ANY (name IN n.\`organization-name\` WHERE name CONTAINS "${name}") RETURN n LIMIT 25`,
+        cypher: `MATCH (n:Organization) WHERE ANY (name IN n.\`organization-name\` WHERE name CONTAINS "${name}") RETURN n LIMIT 250`,
       }).then((res) => res.data);
       this.count = res.count;
       this.TableData = res.data;

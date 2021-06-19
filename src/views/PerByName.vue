@@ -140,7 +140,7 @@ export default {
       let res = await neo4j_sql({
         cypher: `MATCH (n:Person) WHERE ${conditions.join(
           " AND "
-        )} RETURN n LIMIT 25`,
+        )} RETURN n LIMIT 250`,
       }).then((res) => res.data);
       this.count = res.count;
       this.TableData = res.data;

@@ -52,8 +52,8 @@ def ScoreforI(tickers: list, edu: int) -> int:
 
 @app.route('/api/pscore')
 def api_pscore():
-    tickers = request.args.get('tickers')
-    edu = request.args.get('edu')
+    tickers = request.args.getlist('tickers[]')
+    edu = int(request.args.get('edu'))
     return ScoreforI(tickers, edu)
 
 
