@@ -41,7 +41,7 @@
       <div class="table">
         <el-table
           :data="PersonDataList"
-          height="550"
+        
           stripe
           style="width: 100%"
           v-loading="listLoading"
@@ -77,6 +77,30 @@
         </el-table>
       </div>
     </div>
+    <div id="PrimaryQuote">
+      <h1 class="title">主要报价</h1>
+      <div class="content">
+        <div class="myform">
+          <el-form
+            ref="form"
+            :model="FormData"
+            label-position="left"
+            label-width="100px"
+          >
+            <el-form-item label="RIC">
+              <span> {{ FormData.hasPermId }} </span>
+            </el-form-item>
+            <el-form-item label="股票代码">
+              <span> {{ FormData.uri }} </span>
+            </el-form-item>
+            <el-form-item label="交换">
+              <span> {{ FormData["organization-name"] }} </span>
+            </el-form-item>           
+          </el-form>
+        </div>
+      </div>
+        
+     </div> 
   </div>
 </template>
 
@@ -110,6 +134,11 @@ export default {
         cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
       }).then((res) => res.data)) || [];
     this.PersonDataList = res1.data.map((x) => this.getProperties(x));
+    let res2 =
+      (await neo4j_sql({
+        cypher: `MATCH path=(p:Person)-[]->(d:Directorship)-[]->(o:Organization) WHERE o.hasPermId="${this.hasPermId}" RETURN path LIMIT 25`,
+      }).then((res) => res.data)) || [];
+    this.QuoteDataList = res2.data.map((x) => this.getProperties(x));
   },
   methods: {
     getProperties(path) {
