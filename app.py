@@ -29,7 +29,7 @@ def ScoreforO(ticker: str) -> int:
     weight = [0.55, 0.15, 0.05, 0.05, 0.1, 0.1]
     fin = []
     i = df.loc["Income Before Tax"]
-    fin.append((i.sum()-i.min()*4)/(i.max()-i.min()))
+    fin.append((i.sum()-i.min()*4)/(i.max()-i.min())*5)
     #i=df.loc["Total Revenue"]/df.loc["Total Revenue"]
     return fin[0]
 
