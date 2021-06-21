@@ -5,6 +5,10 @@ import json
 from json import JSONEncoder
 import redis
 from datetime import datetime
+import numpy as np
+
+
+import numpy as np
 
 from flask.helpers import make_response
 from neo4j import GraphDatabase
@@ -24,7 +28,9 @@ def ScoreforO(ticker: str) -> int:
     msft = yf.Ticker(ticker)
     df = msft.get_financials(proxy='http://7c00h.xyz:7890')
     if df.empty:
-        return 5.0
+        n=np.random.random(1)*3
+        n = (math.exp(n)/(math.exp(n)+1)-0.5)*20
+        return n
     items = ["Income Before Tax", ""]
     weight = [0.55, 0.15, 0.05, 0.05, 0.1, 0.1]
     fin = []
@@ -45,6 +51,7 @@ def ScoreforI(tickers: list, edu: int) -> int:
     for i in tickers:
         score += ScoreforO(i)
     edu = edu/1.6
+    score=score/6
     score = (math.exp(score)/(math.exp(score)+1)-0.5)*8
     lscore = (math.exp(edu)/(math.exp(edu)+1)-0.5)*2
     return {'score': score+lscore}
