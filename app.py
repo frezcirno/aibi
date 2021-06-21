@@ -26,19 +26,24 @@ CORS(app)
 
 def ScoreforO(ticker: str) -> int:
     msft = yf.Ticker(ticker)
-    df = msft.get_financials(proxy='http://7c00h.xyz:7890')
-    if df.empty:
+    try:
+        df = msft.get_financials(proxy='http://7c00h.xyz:7890')
+        if df.empty:
+            print("lws")
+            n=np.random.random(1)*3
+            n = (math.exp(n)/(math.exp(n)+1)-0.5)*20
+            return n
+        items = ["Income Before Tax", ""]
+        weight = [0.55, 0.15, 0.05, 0.05, 0.1, 0.1]
+        fin = []
+        i = df.loc["Income Before Tax"]
+        fin.append((i.sum()-i.min()*4)/(i.max()-i.min())*5)
+        #i=df.loc["Total Revenue"]/df.loc["Total Revenue"]
+        return fin[0]
+    except:
         n=np.random.random(1)*3
         n = (math.exp(n)/(math.exp(n)+1)-0.5)*20
-        return n
-    items = ["Income Before Tax", ""]
-    weight = [0.55, 0.15, 0.05, 0.05, 0.1, 0.1]
-    fin = []
-    i = df.loc["Income Before Tax"]
-    fin.append((i.sum()-i.min()*4)/(i.max()-i.min())*5)
-    #i=df.loc["Total Revenue"]/df.loc["Total Revenue"]
-    return fin[0]
-
+        return n 
 
 @app.route('/api/oscore')
 def api_oscore():
