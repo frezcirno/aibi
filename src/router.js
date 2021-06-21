@@ -97,6 +97,27 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    name: 'DiGraph',
+    path: '/DiGraph',
+    component: Layout,
+    meta: { title: '关系查询', icon: 'el-icon-share' },
+    redirect: '/DiGraph/Person',
+    children: [
+      {
+        name: 'PersonDiGraph',
+        path: 'Person',
+        component: () => import('@/views/PersonDiGraph'),
+        meta: { title: '人员关系查询', icon: 'el-icon-share' }
+      },
+      {
+        name: 'OrganizationDiGraph',
+        path: 'Organization',
+        component: () => import('@/views/OrganizationDiGraph'),
+        meta: { title: '组织关系查询', icon: 'el-icon-share' }
+      },
+    ]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

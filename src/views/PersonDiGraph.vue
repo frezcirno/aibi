@@ -1,0 +1,196 @@
+<template>
+  <!-- Firefox bug: height:100% in min-height not inheriting height
+  https://stackoverflow.com/questions/8468066/child-inside-parent-with-min-height-100-not-inheriting-height -->
+  <div style="position: absolute; width: 100%; height: 100%">
+    <div style="position: absolute; bottom: 5px; left: 5px; right: 5px">
+      <el-input
+        v-model="hasPermId2"
+        placeholder="请输入要查询关系的两个人的PermID, 以逗号分隔"
+      >
+        <el-button slot="append" @click.prevent="search">提交</el-button>
+      </el-input>
+    </div>
+    <div id="graph" style="width: 100%; height: 100%"></div>
+  </div>
+</template>
+
+<script>
+import * as d3 from "d3";
+window.d3 = d3;
+import "neo4jd3/dist/css/neo4jd3.min.css";
+import Neo4JD3 from "neo4jd3";
+import { neo4j_sql } from "@/api";
+
+var neo4jd3 = {};
+var oNodesDict = new Map();
+var oRelationshipsDict = new Map();
+
+export default {
+  name: "PersonDiGraph",
+  data() {
+    return {
+      hasPermId2: "34413992432,34418722079",
+    };
+  },
+  computed: {
+    hasPermIdA() {
+      return this.hasPermId2.split(",")[0];
+    },
+    hasPermIdB() {
+      return this.hasPermId2.split(",")[1];
+    },
+    cypher() {
+      return `match p=(p1:Person{hasPermId:"${this.hasPermIdA}"})-[*2]-(p2:Person{hasPermId:"${this.hasPermIdB}"}) RETURN p LIMIT 100`;
+    },
+  },
+  async created() {
+    if (this.hasPermId2) {
+      let neo4jData = await this.getData(this.cypher);
+      this.initTree(neo4jData);
+    }
+  },
+  methods: {
+    initTree(neo4jData) {
+      let that = this;
+      neo4jd3 = new Neo4JD3("#graph", {
+        // highlight: [
+        //   {
+        //     class: "Person",
+        //     property: "name",
+        //     value: "neo4jd3",
+        //   },
+        //   {
+        //     class: "Organization",
+        //     property: "userId",
+        //     value: "eisman",
+        //   },
+        // ],
+        /// Inner Image
+        icons: {
+          Person: "user",
+          Organization: "building",
+          Officership: "briefcase",
+          Directorship: "briefcase",
+          TenureInOrganization: "briefcase",
+          Resource: "recycle",
+          AcademicQualification: "university",
+          Major: "book",
+        },
+        /// Bottom Right Corner Image
+        // images: {
+        //   Person: "img/twemoji/1f3e0.svg",
+        //   Organization: "img/twemoji/1f382.svg",
+        //   Password: "img/twemoji/1f511.svg",
+        //   Project: "img/twemoji/2198.svg",
+        //   "Project|name|neo4jd3": "img/twemoji/2196.svg",
+        //   User: "img/twemoji/1f600.svg",
+        // },
+        infoPanel: true,
+        minCollision: 60, // Minimum distance between nodes. Default: 2 * nodeRadius.
+        neo4jData,
+        nodeRadius: 25,
+        // zoomFit: true,
+        /// 单击时进入更多节点
+        // onNodeClick: function (node) {
+        //   if (node.labels.includes("Person")) {
+        //     console.log(node);
+        //     that.$router.push({
+        //       name: "PersonDetail",
+        //       params: { hasPermId: node.properties.hasPermId },
+        //     });
+        //   } else if (node.labels.includes("Organization")) {
+        //     console.log(node);
+        //     that.$router.push({
+        //       name: "OrganizationDetail",
+        //       params: { hasPermId: node.properties.hasPermId },
+        //     });
+        //   } else {
+        //     window.open(node.properties.uri, "_blank");
+        //   }
+        // },
+        /// 双击时展开更多节点
+        onNodeDoubleClick: function (node) {
+          let id = node.id;
+          let cypher = `match p=(n)-[]-() WHERE id(n)=${id} RETURN p LIMIT 25`;
+          that.getData(cypher).then((data) => {
+            neo4jd3.updateWithNeo4jData(data);
+          });
+        },
+      });
+    },
+    async search() {
+      oNodesDict.clear();
+      oRelationshipsDict.clear();
+      let neo4jData = await this.getData(this.cypher);
+      this.initTree(neo4jData);
+    },
+    async getData(cypher) {
+      const loading = this.$loading({
+        target: "#graph",
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      let res = await neo4j_sql({ cypher });
+      loading.close();
+      return this.preprocessUnique(res.data.data);
+    },
+    preprocessUnique(paths) {
+      let nodesDict = new Map();
+      let relationshipsDict = new Map();
+      for (const path of paths) {
+        for (const node of path.nodes) {
+          if (oNodesDict.has(node.id)) {
+            continue;
+          }
+          if (node.labels.length == 0) {
+            node.labels.push("Resource");
+          }
+          nodesDict.set(node.id, node);
+          oNodesDict.set(node.id, node);
+        }
+        for (const relationship of path.relationships) {
+          relationship.startNode = relationship.start_node.id;
+          relationship.endNode = relationship.end_node.id;
+          relationship.properties = {};
+          delete relationship.start_node;
+          delete relationship.end_node;
+          delete relationship.nodes;
+
+          if (oRelationshipsDict.has(relationship.id)) {
+            continue;
+          }
+
+          let ok = true;
+          for (const relationship1 of oRelationshipsDict.values()) {
+            if (
+              (relationship.startNode == relationship1.endNode &&
+                relationship.endNode == relationship1.startNode) ||
+              (relationship.startNode == relationship1.startNode &&
+                relationship.endNode == relationship1.endNode)
+            ) {
+              ok = false;
+              break;
+            }
+          }
+          if (!ok) {
+            continue;
+          }
+
+          relationshipsDict.set(relationship.id, relationship);
+          oRelationshipsDict.set(relationship.id, relationship);
+        }
+      }
+
+      let nodes = Array.from(nodesDict.values());
+      let relationships = Array.from(relationshipsDict.values());
+      let graph = { nodes, relationships };
+      let data = [{ graph }];
+      let columns = [];
+      let results = [{ columns, data }];
+      let res = { results, errors: [] };
+      return res;
+    },
+  },
+};
+</script>
