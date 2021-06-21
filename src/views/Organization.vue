@@ -33,7 +33,7 @@
               <span> {{ FormData.hasIPODate }} </span>
             </el-form-item>
             <el-form-item label="综合评分">
-              <span> {{ score + " / 10.0" }} </span>
+              <span> {{ score.toFixed(2) + " / 10" }} </span>
             </el-form-item>
           </el-form>
         </div>
@@ -137,7 +137,7 @@ export default {
       QuoteData: {},
       InstruData: {},
       PersonDataList: [],
-      score: 0.0,
+      score: 0.00000000001,
     };
   },
   computed: {

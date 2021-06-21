@@ -31,7 +31,7 @@
               </span>
             </el-form-item>
             <el-form-item label="评分">
-              <span> {{ score + " / 5.0" }} </span>
+              <span> {{ score.toFixed(2) + " / 5" }} </span>
             </el-form-item>
           </el-form>
         </div>
